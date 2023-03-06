@@ -37,7 +37,6 @@ class HBNBCommand(cmd.Cmd):
 
     def precmd(self, line):
         """Reformat command line for advanced command syntax.
-
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
         """
@@ -113,18 +112,42 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+    def do_create(self, arg):
+    """ Create an object of any class with given parameters """
+    if not arg:
+        print("** class name missing **")
+        return
+    args = arg.split()
+    class_name = args[0]
+
+    if class_name not in HBNBCommand.classes:
+        print("** class doesn't exist **")
+        return
+
+    # create a dictionary of keyword arguments
+    kwargs = {}
+    for i in range(1, len(args)):
+        try:
+            key, value = args[i].split('=')
+            # replace underscores with spaces in key name
+            key = key.replace('_', ' ')
+            # handle string values
+            if value[0] == '"' and value[-1] == '"':
+                value = value[1:-1].replace('\\', '')
+            # handle float values
+            elif '.' in value:
+                value = float(value)
+            # handle integer values
+            else:
+                value = int(value)
+            kwargs[key] = value
+        except:
+            continue
+
+    new_instance = HBNBCommand.classes[class_name](**kwargs)
+    storage.save()
+    print(new_instance.id)
+    storage.save()
 
     def help_create(self):
         """ Help information for the create method """
