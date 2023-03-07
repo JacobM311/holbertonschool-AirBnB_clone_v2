@@ -141,7 +141,7 @@ class HBNBCommand(cmd.Cmd):
             else:
                 value = int(value)
             kwargs[key] = value
-        except Exception:
+        except:
             continue
 
     new_instance = HBNBCommand.classes[class_name](**kwargs)
